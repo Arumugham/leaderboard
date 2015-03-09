@@ -11,7 +11,7 @@ if(Meteor.isClient){
 	console.log("Hello Client");
 	Template.leaderboard.helpers({
  		'player':function(){
- 			return PlayersList.find({},{ sort: { score: -1, name: 1 }});
+			return PlayersList.find({ createdBy: Meteor.userId()},{ sort: { score: -1, name: 1 }});
  		},
  		'selectedClass': function(){
  			var playerID = this._id;
@@ -21,7 +21,7 @@ if(Meteor.isClient){
  			}
  		},
  		'count': function(){
- 			return PlayersList.find().count()
+ 			return PlayersList.find({createdBy: Meteor.userId()}).count()
  		},
  		'showSelectedPlayer': function(){
  			var selectedPlayer = Session.get('selectedPlayer');
@@ -54,9 +54,11 @@ if(Meteor.isClient){
  			event.preventDefault();
  			var playerName = event.target.playerName.value;
  			var playerScore = parseInt(event.target.playerScore.value);
+ 			var currentUserID = Meteor.userId();
  			PlayersList.insert({
  				name: playerName,
- 				score: playerScore
+ 				score: playerScore,
+ 				createdBy: currentUserID
  			});
  			event.target.playerName.value = "";
  			event.target.playerScore.value = "";
