@@ -22,14 +22,16 @@ if(Meteor.isClient){
  		},
  		'count': function(){
  			return PlayersList.find().count()
+ 		},
+ 		'showSelectedPlayer': function(){
+ 			var selectedPlayer = Session.get('selectedPlayer');
+ 			return PlayersList.findOne(selectedPlayer);
  		}
  	});
  	Template.leaderboard.events({
  		'click .player': function(){
  			var playerID = this._id;
  			Session.set('selectedPlayer', playerID);
- 			var selectedPlayer = Session.get("selectedPlayer");
- 			console.log(selectedPlayer);
  		},
  		'click .increment': function(){
  			var selectedPlayer = Session.get('selectedPlayer');
@@ -38,8 +40,27 @@ if(Meteor.isClient){
  		'click .decrement': function(){
  			var selectedPlayer = Session.get('selectedPlayer');
  			PlayersList.update(selectedPlayer, {$inc: {score : -5}});
+ 		},
+ 		'click .remove':function(){
+ 			var selectedPlayer = Session.get('selectedPlayer');
+ 			if(window.confirm("Are you sure, you want to remove?")){
+ 				PlayersList.remove(selectedPlayer);
+ 			}
+ 			
  		}
-
+ 	});
+ 	Template.addPlayerForm.events({
+ 		'submit form': function(event){
+ 			event.preventDefault();
+ 			var playerName = event.target.playerName.value;
+ 			var playerScore = parseInt(event.target.playerScore.value);
+ 			PlayersList.insert({
+ 				name: playerName,
+ 				score: playerScore
+ 			});
+ 			event.target.playerName.value = "";
+ 			event.target.playerScore.value = "";
+ 		}	
  	});
 }
 if(Meteor.isServer){
